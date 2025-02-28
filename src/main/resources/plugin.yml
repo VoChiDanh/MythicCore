@@ -1,0 +1,11 @@
+name: MythicCore
+version: '1.0'
+main: net.danh.mythicCore.MythicCore
+api-version: '1.21'
+authors: [ VoChiDanh ]
+softdepend:
+  - MythicMobs
+  - PlaceholderAPI
+commands:
+  mcore:
+    description: MythicCore Commands

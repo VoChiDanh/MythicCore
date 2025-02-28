@@ -1,0 +1,6 @@
+settings:
+  debug: false
+  prefix: "<white>[ <aqua>MythicCore</aqua> ]"
+
+# Config version
+version: 1

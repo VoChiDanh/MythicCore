@@ -1,0 +1,9 @@
+name: "&aExample"
+exp-source: exp
+default: true
+skills:
+  - skill_1;1
+  - skill_2;5
+  - skill_3;10
+  - skill_4;25
+  - skill_5;50
