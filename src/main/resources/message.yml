@@ -1,2 +1,6 @@
 admin:
   reload: "<aqua>Reloaded complete"
+
+user:
+  skill_is_null: "<red>Skill {name} <red>is null"
+  not_enough_level: "<red>You need reach level {req_level} to use skill {name}"

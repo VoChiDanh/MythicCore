@@ -29,13 +29,13 @@ public class PlayerData {
             for (String classID : ExpData.getListClass()) {
                 if (!currentClass.equalsIgnoreCase(classID)) {
                     playerData.setClass(classID);
-                    playerData.setLevel(Math.max(1, getFileData().getInt("class." + classID + ".level")));
-                    playerData.setExp(Math.max(0, getFileData().getInt("class." + classID + ".exp")));
+                    playerData.setLevel(Math.max(1, getFileData().getLong("class." + classID + ".level")));
+                    playerData.setExp(Math.max(0, getFileData().getLong("class." + classID + ".exp")));
                 }
             }
             playerData.setClass(currentClass);
-            playerData.setLevel(Math.max(1, getFileData().getInt("class." + currentClass + ".level")));
-            playerData.setExp(Math.max(0, getFileData().getInt("class." + currentClass + ".exp")));
+            playerData.setLevel(Math.max(1, getFileData().getLong("class." + currentClass + ".level")));
+            playerData.setExp(Math.max(0, getFileData().getLong("class." + currentClass + ".exp")));
         }
     }
 
@@ -105,11 +105,11 @@ public class PlayerData {
         return new ClassManager(getClassID()).getClassName();
     }
 
-    public int getLevel() {
-        return ExpData.playerStats.getOrDefault(p.getName() + ";" + getClassID() + ";main_level", 1);
+    public long getLevel() {
+        return ExpData.playerStats.getOrDefault(p.getName() + ";" + getClassID() + ";main_level", 1l);
     }
 
-    public void setLevel(int level) {
+    public void setLevel(long level) {
         if (ExpData.playerStats.containsKey(p.getName() + ";" + getClassID() + ";main_level")) {
             ExpData.playerStats.replace(p.getName() + ";" + getClassID() + ";main_level", level);
         } else {
@@ -117,8 +117,8 @@ public class PlayerData {
         }
     }
 
-    public void editLevel(int level) {
-        int final_level = getLevel() + level;
+    public void editLevel(long level) {
+        long final_level = getLevel() + level;
         if (ExpData.playerStats.containsKey(p.getName() + ";" + getClassID() + ";main_level")) {
             if (final_level >= 1 && final_level <= new ClassManager(getClassID()).getMaxLevel()) {
                 ExpData.playerStats.replace(p.getName() + ";" + getClassID() + ";main_level", final_level);
@@ -132,11 +132,11 @@ public class PlayerData {
         }
     }
 
-    public int getExp() {
-        return ExpData.playerStats.getOrDefault(p.getName() + ";" + getClassID() + ";main_exp", 0);
+    public long getExp() {
+        return ExpData.playerStats.getOrDefault(p.getName() + ";" + getClassID() + ";main_exp", 0L);
     }
 
-    public void setExp(int exp) {
+    public void setExp(long exp) {
         if (ExpData.playerStats.containsKey(p.getName() + ";" + getClassID() + ";main_exp")) {
             ExpData.playerStats.replace(p.getName() + ";" + getClassID() + ";main_exp", exp);
         } else {
@@ -144,22 +144,24 @@ public class PlayerData {
         }
     }
 
-    public void editExp(int exp) {
-        int final_exp = getExp() + exp;
+    public void editExp(long exp) {
+        long final_exp = getExp() + exp;
         if (ExpData.playerStats.containsKey(p.getName() + ";" + getClassID() + ";main_exp")) {
-            if (final_exp >= 1 && final_exp <= new ClassManager(getClassID()).getMaxExp(getLevel())) {
+            if (final_exp <= new ClassManager(getClassID()).getMaxExp(getLevel())) {
                 ExpData.playerStats.replace(p.getName() + ";" + getClassID() + ";main_exp", final_exp);
             } else {
-                int count_exp = final_exp - new ClassManager(getClassID()).getMaxExp(getLevel());
+                long count_exp = final_exp - new ClassManager(getClassID()).getMaxExp(getLevel());
                 editLevel(1);
+                setExp(0);
                 editExp(count_exp);
             }
         } else {
             if (final_exp >= 1 && final_exp <= new ClassManager(getClassID()).getMaxExp(getLevel())) {
                 ExpData.playerStats.put(p.getName() + ";" + getClassID() + ";main_exp", final_exp);
             } else {
-                int count_exp = final_exp - new ClassManager(getClassID()).getMaxExp(getLevel());
+                long count_exp = final_exp - new ClassManager(getClassID()).getMaxExp(getLevel());
                 editLevel(1);
+                setExp(0);
                 editExp(count_exp);
             }
         }

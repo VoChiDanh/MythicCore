@@ -4,3 +4,8 @@ settings:
 
 # Config version
 version: 1
+
+health-scale:
+  enabled: true
+  scale: 20
+  delay: 0

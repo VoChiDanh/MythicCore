@@ -1,10 +1,13 @@
 package net.danh.mythicCore;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import net.danh.mythicCore.CMD.MCCMD;
 import net.danh.mythicCore.Compatible.MythicMobs.MCoreMythicRegister;
 import net.danh.mythicCore.Compatible.Placeholder.PapiParse;
 import net.danh.mythicCore.Listeners.JoinQuit;
-import net.danh.mythicCore.NMS.NMSAssistant;
+import net.danh.mythicCore.Listeners.PacketListeners;
+import net.danh.mythicCore.Listeners.Settings.HealthScale;
 import net.danh.mythicCore.PlayerData.ExpData;
 import net.danh.mythicCore.PlayerData.PlayerData;
 import net.danh.mythicCore.Resources.File;
@@ -29,9 +32,14 @@ public final class MythicCore extends JavaPlugin {
     }
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         mythicCore = this;
-        getLogger().log(Level.INFO, "Server NMS: " + new NMSAssistant().getNMSVersion());
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketListeners(), PacketListenerPriority.NORMAL);
+    }
+
+    @Override
+    public void onEnable() {
+        getLogger().log(Level.INFO, "Server Version: " + PacketEvents.getAPI().getServerManager().getVersion().getReleaseName());
         SimpleConfigurationManager.register(this);
         File.createFiles();
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -54,6 +62,8 @@ public final class MythicCore extends JavaPlugin {
             getLogger().warning("Has issue with Class");
         }
         registerEvents(new JoinQuit());
+        if (File.getConfig().getBoolean("health-scale.enabled"))
+            Bukkit.getPluginManager().registerEvents(new HealthScale(File.getConfig().getDouble("health-scale.scale"), File.getConfig().getInt("health-scale.delay", 0)), mythicCore);
         new MCCMD();
         Executors.newScheduledThreadPool(Integer.MAX_VALUE).scheduleAtFixedRate(() -> Bukkit.getOnlinePlayers().forEach(p -> new PlayerData(p).syncXPBar()), 0, 1, TimeUnit.SECONDS);
     }

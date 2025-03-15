@@ -1,5 +1,6 @@
 package net.danh.mythicCore.CMD;
 
+import net.danh.mythicCore.PlayerData.ClassManager;
 import net.danh.mythicCore.PlayerData.PlayerData;
 import net.danh.mythicCore.Resources.File;
 import net.danh.mythicCore.Utils.Chat;
@@ -30,25 +31,33 @@ public class MCCMD extends CMDBase {
             } else if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("level")) {
                     Player p = Bukkit.getPlayer(args[1]);
-                    int number = Number.getInteger(args[2]);
+                    long number = Number.getLong(args[2]);
                     PlayerData playerData = new PlayerData(p);
                     playerData.setLevel(number);
                 } else if (args[0].equalsIgnoreCase("editLevel")) {
                     Player p = Bukkit.getPlayer(args[1]);
-                    int number = Number.getInteger(args[2]);
+                    long number = Number.getLong(args[2]);
                     PlayerData playerData = new PlayerData(p);
                     playerData.editLevel(number);
                 } else if (args[0].equalsIgnoreCase("exp")) {
                     Player p = Bukkit.getPlayer(args[1]);
-                    int number = Number.getInteger(args[2]);
+                    long number = Number.getLong(args[2]);
                     PlayerData playerData = new PlayerData(p);
                     playerData.setExp(number);
                 } else if (args[0].equalsIgnoreCase("editExp")) {
                     Player p = Bukkit.getPlayer(args[1]);
-                    int number = Number.getInteger(args[2]);
+                    long number = Number.getLong(args[2]);
                     PlayerData playerData = new PlayerData(p);
                     playerData.editExp(number);
                 }
+            }
+        }
+        if (args.length == 2 && c instanceof Player p) {
+            if (args[0].equalsIgnoreCase("cast-skill")) {
+                String skillID = args[1];
+                PlayerData playerData = new PlayerData(p);
+                ClassManager classManager = new ClassManager(playerData.getClassID());
+                classManager.castSkill(p, skillID);
             }
         }
     }
@@ -65,6 +74,7 @@ public class MCCMD extends CMDBase {
                 commands.add("exp");
                 commands.add("editExp");
             }
+            commands.add("cast-skill");
             StringUtil.copyPartialMatches(args[0], commands, completions);
         } else if (args.length == 2) {
             if (sender.hasPermission("mcore.admin")) {
@@ -74,6 +84,11 @@ public class MCCMD extends CMDBase {
                         || args[0].equalsIgnoreCase("editExp")) {
                     Bukkit.getOnlinePlayers().forEach(player -> commands.add(player.getName()));
                 }
+            }
+            if (args[0].equalsIgnoreCase("cast-skill") && sender instanceof Player p) {
+                PlayerData playerData = new PlayerData(p);
+                ClassManager classManager = new ClassManager(playerData.getClassID());
+                commands.addAll(classManager.getListSkill());
             }
             StringUtil.copyPartialMatches(args[1], commands, completions);
         } else if (args.length == 3) {

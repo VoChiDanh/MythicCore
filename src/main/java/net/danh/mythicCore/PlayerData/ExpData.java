@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class ExpData {
-    private static final HashMap<String, List<Integer>> expSource = new HashMap<>();
+    private static final HashMap<String, List<Long>> expSource = new HashMap<>();
     private static final List<String> listClass = new ArrayList<>();
     public static HashMap<String, String> playerInfo = new HashMap<>();
-    public static HashMap<String, Integer> playerStats = new HashMap<>();
+    public static HashMap<String, Long> playerStats = new HashMap<>();
 
     public static void loadClass() throws IOException {
         if (!listClass.isEmpty())
@@ -68,11 +68,11 @@ public class ExpData {
             MythicCore.getMythicCore().getLogger().severe("The expected file " + file.getPath() + " does not exist.");
             return; // Exit if the file does not exist
         }
-        List<Integer> expList = new ArrayList<>();
+        List<Long> expList = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String readLine;
             while ((readLine = reader.readLine()) != null) {
-                expList.add(Integer.valueOf(readLine));
+                expList.add(Long.valueOf(readLine));
             }
         }
         getExpSource().put(expFile.replace(".txt", ""), expList);
@@ -119,16 +119,16 @@ public class ExpData {
         }
     }
 
-    public static int getExperience(String expSource, int level) {
+    public static long getExperience(String expSource, long level) {
         Validate.isTrue(level > 0, "Level must be stricly positive");
-        return getExpSource().get(expSource).get(Math.min(level, getExpSource().get(expSource).size()) - 1);
+        return getExpSource().get(expSource).get(Math.toIntExact(Math.min(level, getExpSource().get(expSource).size()) - 1));
     }
 
     public static int getMaxLevel(String expSource) {
         return getExpSource().get(expSource).size() - 1;
     }
 
-    public static HashMap<String, List<Integer>> getExpSource() {
+    public static HashMap<String, List<Long>> getExpSource() {
         return expSource;
     }
 

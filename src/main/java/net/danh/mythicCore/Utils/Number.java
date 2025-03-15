@@ -10,11 +10,11 @@ public class Number {
 
     private static final String[] suffix = new String[]{"", "K", "M", "B", "T", "Q"};
 
-    public static @NotNull String formatFull(int number) {
+    public static @NotNull String formatFull(long number) {
         return new DecimalFormat("###,###.###").format(number);
     }
 
-    public static String format(int number) {
+    public static String format(long number) {
         String r = new DecimalFormat("##0E0").format(number);
         r = r.replaceAll("E[0-9]", suffix[Character.getNumericValue(r.charAt(r.length() - 1)) / 3]);
         int MAX_LENGTH = 4;

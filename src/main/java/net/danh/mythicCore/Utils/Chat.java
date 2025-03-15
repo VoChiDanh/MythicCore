@@ -163,7 +163,38 @@ public class Chat {
     }
 
     public static void sendMessage(@NotNull Audience sender, String message) {
-        sender.sendMessage(colorizewp(message));
+        if (message != null && !message.isBlank())
+            sender.sendMessage(colorizewp(message));
+    }
+
+    public static List<String> replace(@NotNull List<String> x, @NotNull String y, String z) {
+        return x.stream().map(s -> replace(s, y, z)).collect(Collectors.toList());
+    }
+
+    @NotNull
+    public static String replace(String x, @NotNull String y, String z) {
+        if (x != null) {
+            if (y.isEmpty()) {
+                return x;
+            }
+
+            StringBuilder result = new StringBuilder();
+            int start = 0;
+
+            while (start < x.length()) {
+                int index = x.indexOf(y, start);
+                if (index == -1) {
+                    result.append(x.substring(start));
+                    break;
+                }
+                result.append(x, start, index);
+                result.append(z);
+                start = index + y.length();
+            }
+
+            return result.toString();
+        }
+        return "";
     }
 
     public static void sendMessage(Audience sender, @NotNull List<String> messages) {

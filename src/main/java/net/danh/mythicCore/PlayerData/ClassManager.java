@@ -1,12 +1,15 @@
 package net.danh.mythicCore.PlayerData;
 
+import io.lumine.mythic.bukkit.MythicBukkit;
+import net.danh.mythicCore.Resources.File;
 import net.danh.mythicCore.Utils.Chat;
+import net.danh.mythicCore.Utils.Number;
 import net.xconfig.bukkit.model.SimpleConfigurationManager;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ClassManager {
 
@@ -36,54 +39,37 @@ public class ClassManager {
         return getFileManager().contains("default") && getFileManager().getBoolean("default");
     }
 
-    public int getMaxLevel() {
+    public long getMaxLevel() {
         return ExpData.getMaxLevel(getExpSource());
     }
 
-    public int getMaxExp(int level) {
+    public long getMaxExp(long level) {
         return ExpData.getExperience(getExpSource(), level);
     }
 
     public List<String> getListSkill() {
-        return getFileManager().getStringList("skills");
+        return Objects.requireNonNull(getFileManager().getConfigurationSection("skills")).getKeys(false).stream().toList();
     }
 
-    public List<String> getSkillName() {
-        List<String> skills = new ArrayList<>();
-        getListSkill().forEach(s -> skills.add(s.split(";")[0]));
-        return skills;
+    public String getSkillName(String skillID) {
+        return Chat.normalColorize(getFileManager().getString("skills." + skillID + ".display"));
     }
 
-    public int getReqSkills(String skill) {
-        for (String s : getListSkill()) {
-            if (skill.equalsIgnoreCase(s.split(";")[0])) {
-                return Integer.parseInt(s.split(";")[1]);
-            }
-        }
-        return 0;
+    public long getReqSkills(String skillID) {
+        return getFileManager().getLong("skills." + skillID + ".level");
     }
 
     public void castSkill(Player p, String skill) {
-//        int level = new PlayerData(p).getLevel();
-//        int req = getReqSkills(skill);
-//        CooldownMap map = new CooldownMap();
-//        double remaining = map.getCooldown(skill);
-//        boolean isOnCooldown = map.isOnCooldown(skill);
-//        if (!isOnCooldown) {
-//            if (getSkillName().contains(skill)) {
-//                if (level >= req) {
-//                    MythicBukkit.inst().getSkillManager().getSkill(skill).ifPresentOrElse(value -> {
-//                        MythicBukkit.inst().getAPIHelper().castSkill(p, value.getInternalName());
-//                        map.applyCooldown(skill, value.getConfig().getDouble("Cooldown"));
-//                    }, () -> {
-//                        sendPlayerMessage(p, File.getMessage().getConfig().getString("skill_is_null", "&cSkill #name# is null").replace("#name#", skill));
-//                    });
-//                } else {
-//                    sendPlayerMessage(p, File.getMessage().getConfig().getString("not_enough_level", "&cYou need reach level #level#").replace("#level#", String.valueOf(req)));
-//                }
-//            }
-//        } else {
-//            sendPlayerMessage(p, File.getMessage().getConfig().getString("cooldown_skill", "&cYou need wait %time%s to cast skill again").replace("%time%", String.valueOf(remaining)));
-//        }
+        String mythicSkill = getFileManager().getString("skills." + skill + ".id");
+        PlayerData playerData = new PlayerData(p);
+        long level = playerData.getLevel();
+        long reqLevel = getReqSkills(skill);
+        if (level >= reqLevel) {
+            MythicBukkit.inst().getSkillManager().getSkill(mythicSkill).ifPresentOrElse(value -> MythicBukkit.inst().getAPIHelper().castSkill(p, value.getInternalName()), () -> Chat.sendMessage(p, Chat.replace(File.getMessage().getString("user.skill_is_null"), "{name}", getSkillName(skill))));
+        } else {
+            Chat.sendMessage(p, Chat.replace(
+                    Chat.replace(File.getMessage().getString("user.not_enough_level"), "{name}", getSkillName(skill))
+                    , "{req_level}", Number.formatFull(reqLevel)));
+        }
     }
 }
